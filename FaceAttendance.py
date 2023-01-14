@@ -2,9 +2,7 @@ import cv2
 import numpy as np
 import face_recognition
 import os
-
 from datetime import datetime
-
 
 #이미지 가져올 목록 생성
 path = 'faces'
@@ -15,7 +13,7 @@ print(myList)#faces 파일에 있는 이미지 목록 이름들이 출력됨.
 
 for cl in myList:
     curImg = cv2.imread(f'{path}/{cl}') #이미지 읽기
-    images.append(curImg)#현재 이미지 추가
+    images.append(curImg) #현재 이미지 추가
     classNames.append(os.path.splitext(cl)[0]) #ex => Elon Musk.jpg 대신 Elon Musk로 분활
 print(classNames)
 
@@ -27,7 +25,7 @@ def findEncodings(images):
         encode = face_recognition.face_encodings(img)[0]  # 감지할 얼굴 인코딩, 첫번째 요소만 가져오기
         encodeList.append(encode) #인코딩 찾은것을 목록에 추가
     return encodeList #목록들 반환
-
+''''
 def markAttendance(name):
     with open('Attendance.csv','r+') as f:
         myDataList = f.readlines()
@@ -39,15 +37,16 @@ def markAttendance(name):
             now = datetime.now()
             dtString = now.strftime('%H:%M:%S')
             f.writelines(f'\n{name},{dtString}')
-
+'''''
 encodeListKnown = findEncodings(images)
 print('Encoding Complete')
 
 
-cap = cv2.VideoCapture(0)
+# 기존 노트북 카메라나 데스크탑 전용 카메라를 사용한 것을 스마트폰 카메라를 사용해서 WebCam을 불러오게 소스 변환
+cap = cv2.VideoCapture("http://192.168.35.193:8080/video") #IP webcam의 주소
 
-while True:
-    success, img = cap.read()
+while True:     #실시간으로 비디오 재생을 위해 while 반복문 사용
+    success, img = cap.read() # 비디오가 있는지 없는지 bool 체크, 비디오 자체를 나타내는 img 변수
     imgS = cv2.resize(img,(0,0),None,0.25,0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)  # RGB로 변환
 
@@ -68,10 +67,14 @@ while True:
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
             cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-            markAttendance(name)
+       #     markAttendance(name)
 
-        cv2.imshow('Webcam', img)
-        cv2.waitKey(1)
+    cv2.imshow('Webcam', img)
+    if cv2.waitKey(1) == ord("q"): #while 무한루프를 빠져나오기 위한 키보드 q를 눌러 WebCam 사용 중지
+        break 
+
+cap.release()
+cv2.destroyAllWindows()
 
 ''''
 #얼굴의 위치 같게 만들기
