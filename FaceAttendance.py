@@ -19,7 +19,7 @@ for cl in myList:
     classNames.append(os.path.splitext(cl)[0]) #ex => Elon Musk.jpg 대신 Elon Musk로 분활
 print(classNames)
 
-#인코딩 계산하는 함수
+##### 인코딩 계산하는 함수  #####
 def findEncodings(images):
     encodeList = []
     for img in images:
@@ -35,6 +35,8 @@ def findEncodings(images):
             encodeList.append(encode[0])  # 인코딩 찾은것을 목록에 추가
     return encodeList #목록들 반환
 
+
+#### 출석 기록을 남기기 위한 함수 #####
 def markAttendance(name: str):
     with open('./Attendance.csv', 'r+') as f:  # 동시에 읽고 쓰기를 원함.
         myDataList = f.readlines()
@@ -79,7 +81,7 @@ print('Encoding Complete')
 
 
 #### 기존 소스에서 노트북 카메라나 데스크탑 전용 카메라를 사용한 것을 스마트폰 카메라를 사용한 WebCam을 불러오게 소스 변환함! #####
-cap = cv2.VideoCapture("http://192.168.35.193:8080/video") #IP webcam의 주소
+cap = cv2.VideoCapture("Address of IP webcam") #IP webcam의 주소
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 120)
@@ -112,7 +114,7 @@ while True:     #실시간으로 비디오 재생을 위해 while 반복문 사�
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)  # 웹켐 상에서 보여지는 얼굴에 네모난 직사각형이 그려짐.
             cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
             cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)   # 직사각형으로 가리키고 있는 얼굴이 무엇인지 화면에 표시해줌.
-            markAttendance(name) # 얼굴을 찾을 때마다 함수 호출
+            markAttendance(name) # 출석 기록 함수 호출
 
 
     cv2.imshow('Webcam', img)
