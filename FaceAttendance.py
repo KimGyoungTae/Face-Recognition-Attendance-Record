@@ -3,12 +3,14 @@ import numpy as np
 import face_recognition
 import os
 from datetime import datetime # 시간과 날짜에 대한 라이브러리
+import json
+import requests
 
 #이미지 가져올 목록 생성
 path = 'FaceFile'
 images = []
 classNames = []
-myList = os.listdir(path)#폴더의 이미지 목록을 가져오기
+myList = os.listdir(path) # 폴더의 이미지 목록을 가져오기 => os 라이브러리를 사용하여 많은 양의 이미지 저장가능
 print(myList)#FaceFile 파일에 있는 이미지 목록 이름들이 출력됨.
 
 for cl in myList:
@@ -25,7 +27,7 @@ def findEncodings(images):
 
         # encode = face_recognition.face_encodings(img)[0] # 감지할 얼굴 인코딩, 첫번째 요소만 가져오기
         encode = face_recognition.face_encodings(img)
-        # 인코딩 했을 때 비어있는걸 가져와서 오류가 발생
+        # 인코딩 했을 때 비어있는걸 (빈 배열) 가져와서 오류가 발생했었음.
 
         if not encode:
             print("입력 데이터 오류")
@@ -42,14 +44,41 @@ def markAttendance(name: str):
             nameList.append(entry[0]) # 첫 번째 요소를 추가, entry[0]은 이름이 될 것이고, 목록의 이름만 추가하게 된다.
         if name not in nameList:    #이름 목록에 이름이 있는지 확인하기 위함.
             now = datetime.now()
-            dtString = now.strftime('%H:%M:%S')
-            f.writelines(f'\n{name},{dtString}')
+            dtString = now.strftime('%H:%M:%S')     # 시/분/초
+            current_date = now.strftime("%Y:%m:%d") # 년/월/일
+            f.writelines(f'\n{name},{dtString},{current_date}')
+            sendToMeMessage(text)  # 출석부에 기록 될 때 출석 알림 메세지 함수 호출!
+
+
+####### 기존 오픈소스와 다르게 출석 확인을 알리기 위해 카카오톡 메세지를 보내준다. ######
+def sendToMeMessage(text):
+    header = {"Authorization": 'Bearer ' + "Access Token"}
+
+    url = "https://kapi.kakao.com/v2/api/talk/memo/default/send" #나에게 보내기 주소
+
+    post = {
+        "object_type": "text",
+        "text": text,
+        "link": {
+            "web_url": "https://developers.kakao.com",
+            "mobile_web_url": "https://developers.kakao.com"
+        },
+        "button_title": "출석 확인"
+    }
+    data = {"template_object": json.dumps(post)}
+    return requests.post(url, headers=header, data=data)
+
+#text = "Successful attendance.!!("+os.path.basename(__file__).replace(".py", ")")
+text = "Face recognition attendance completed!!"
+KAKAO_TOKEN = "TFS_000000000000000000000000000000000000000_sQ"
+#print ((sendToMeMessage(text).text))
+
 
 encodeListKnown = findEncodings(images)
 print('Encoding Complete')
 
 
-# 기존 노트북 카메라나 데스크탑 전용 카메라를 사용한 것을 스마트폰 카메라를 사용해서 WebCam을 불러오게 소스 변환
+#### 기존 소스에서 노트북 카메라나 데스크탑 전용 카메라를 사용한 것을 스마트폰 카메라를 사용한 WebCam을 불러오게 소스 변환함! #####
 cap = cv2.VideoCapture("http://192.168.35.193:8080/video") #IP webcam의 주소
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
@@ -85,25 +114,10 @@ while True:     #실시간으로 비디오 재생을 위해 while 반복문 사�
             cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)   # 직사각형으로 가리키고 있는 얼굴이 무엇인지 화면에 표시해줌.
             markAttendance(name) # 얼굴을 찾을 때마다 함수 호출
 
-    cv2.imshow('Webcam', img)
 
+    cv2.imshow('Webcam', img)
     if cv2.waitKey(1) == ord("q"): #while 무한루프를 빠져나오기 위한 키보드 q를 눌러 WebCam 사용 중지
         break
 
-
 cap.release()
 cv2.destroyAllWindows()
-
-''''
-#얼굴의 위치 같게 만들기
-faceLoc = face_recognition.face_locations(imgElon)[0]
-encodeElon = face_recognition.face_encodings(imgElon)[0]   #감지할 얼굴 인코딩, 첫번째 요소만 가져오기
-cv2.rectangle(imgElon,(faceLoc[3],faceLoc[0]), (faceLoc[1],faceLoc[2]),(255,0,255),2) #우리가 얼굴을 감지한 위치를 확인하기 위해 사각형을 이미지에 그림
-
-faceLocTest = face_recognition.face_locations(imgTest)[0]
-encodeTest = face_recognition.face_encodings(imgTest)[0]   #Test이미지에 대한 첫번째 요소만 가져오기
-cv2.rectangle(imgTest,(faceLocTest[3],faceLocTest[0]), (faceLocTest[1],faceLocTest[2]),(255,0,255),2) #Test 이미지에 사각형 이미지
-
-results = face_recognition.compare_faces([encodeElon],encodeTest) #인코딩 이미지와 Test 이미지 간의 비교하기
-faceDis = face_recognition.face_distance([encodeElon],encodeTest) #이미지 유사성 알기, (==> 얼굴 간의 오차 느낌인거 같음)
-'''''
