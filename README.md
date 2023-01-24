@@ -1,1 +1,1 @@
-# OSSP Face-recognition Attendance record project
+# [OSSP] Face-recognition Attendance record project
