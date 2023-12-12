@@ -7,19 +7,26 @@
 
 
 ## 🖥️ 프로젝트 소개
-OpenCV를 활용하여 사용자의 얼굴을 인식하여 일치할 시 출석부에 기록을 남기면서 동시에 카카오톡으로 출석 확인 메시지가 전달됩니다.
+
 ![image](https://user-images.githubusercontent.com/83820089/218441603-4243ab43-5ea0-41ce-a9f4-1ae1947103ce.png)
 
-### 🤝 기존 오픈소스 : https://github.com/murtazahassan/Face-Recognition
 <br>
 
-## 🕰️ 개발 기간
+OpenCV를 활용하여 사용자의 얼굴을 인식하여 일치할 시 출석부에 기록을 남기면서 동시에 카카오톡으로 출석 확인 메시지가 전달됩니다.
+
+### 🎥 구현 영상 : https://youtu.be/aBTPyji1nHA
+
+### 🤝 기존 오픈소스 : https://github.com/murtazahassan/Face-Recognition
+
+### 📝 개발 정리 : https://vrworld.tistory.com/
+
+### 🕰️ 개발 기간
 * 23.01.05일 - 23.01.17일
 
 ### ⚙️ 개발 환경
 - `PyCharm`
 
-### 📝 개발 정리 : https://vrworld.tistory.com/
+
 <br>
 
 ## 📌 주요 기능
